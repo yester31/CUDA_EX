@@ -4,7 +4,7 @@ const int WIDTH = 1024;
 const int TILE_WIDTH = 32;
 
 //kernel program for the device (GPU): compiled by NVCC
-__global__ void matrixMulKernel_2d_sharedMemory(float* g_C, const float* g_A, const float* g_B) 
+__global__ void matMul_kernel_shared_memory(float* g_C, const float* g_A, const float* g_B)
 {
 	extern __shared__ float s_A[];
 	extern __shared__ float s_B[];
@@ -71,7 +71,7 @@ int main(void) {
 
 	uint64_t start_time2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	
-	matrixMulKernel_2d_sharedMemory << <dimGrid, dimBlock, TILE_WIDTH * TILE_WIDTH * sizeof(float) >> > (dev_o, dev_a, dev_b);
+	matMul_kernel_shared_memory << <dimGrid, dimBlock, TILE_WIDTH * TILE_WIDTH * sizeof(float) >> > (dev_o, dev_a, dev_b);
 	cudaDeviceSynchronize();
 	
 	uint64_t start_time3 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();

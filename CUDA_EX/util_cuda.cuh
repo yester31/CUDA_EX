@@ -57,7 +57,7 @@ void valid_results_f(std::vector<float> &result_1, std::vector<float> &result_2)
 	bool result = true;
 	for (int i = 0; i < result_1.size(); i++) {
 		if ((result_1[i]) != result_2[i]) {
-			printf("[%d] The results is not matched! (%f, %f)\n", i, result_1[i], result_2[i]);
+			//printf("[%d] The results is not matched! (%f, %f)\n", i, result_1[i], result_2[i]);
 			result = false;
 		}
 	}
