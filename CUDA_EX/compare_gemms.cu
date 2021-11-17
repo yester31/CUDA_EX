@@ -96,7 +96,7 @@ cublasStatus_t Sgemm(
 }
 
 //kernel program for the device (GPU): compiled by NVCC
-__global__ void matrixMulKernel_2d_f(
+__global__ void matMul_kernel_f32(
 	float* output, const float* input_a, const float* input_b,
 	int M, int K, int N, const int tcount)
 {
@@ -172,7 +172,7 @@ int main(void) {
 	dim3 dimGrid(grid, 1, 1);
 	dim3 dimBlock(block, 1, 1);//x,y,z
 	uint64_t start_time3 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	matrixMulKernel_2d_f << <dimGrid, dimBlock >> > (dev_o, dev_a, dev_b, M, K, N, thread_cnt);
+	matMul_kernel_f32 << <dimGrid, dimBlock >> > (dev_o, dev_a, dev_b, M, K, N, thread_cnt);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	CUDA_CHECK(cudaMemcpy(output_kernel.data(), dev_o, output_kernel.size() * sizeof(float), cudaMemcpyDeviceToHost));

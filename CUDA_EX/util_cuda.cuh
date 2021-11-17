@@ -41,6 +41,15 @@ void generate_data_f(float* ptr, unsigned int size) {
 	}
 }
 
+void generate_data_i8(char* ptr, unsigned int size) {
+	char tt = 1;
+	while (size--) {
+		*ptr++ = rand() % 10;
+		//*ptr++ = tt;
+	}
+}
+
+
 void valid_results(std::vector<int> &gpu, std::vector<int> &cpu) {
 	bool result = true;
 	for (int i = 0; i < gpu.size(); i++) {
@@ -67,6 +76,15 @@ void valid_results_f(std::vector<float> &result_1, std::vector<float> &result_2)
 
 
 void print_results(std::vector<float> &output, int M, int N) {
+	std::cout << std::endl; std::cout << std::endl;
+	for (int m = 0; m < M; ++m) {
+		for (int n = 0; n < N; ++n) {
+			std::cout << output[m * N + n] << " ";
+		}std::cout << std::endl;
+	}std::cout << std::endl; std::cout << std::endl;
+}
+
+void print_results(std::vector<int> &output, int M, int N) {
 	std::cout << std::endl; std::cout << std::endl;
 	for (int m = 0; m < M; ++m) {
 		for (int n = 0; n < N; ++n) {
