@@ -10,18 +10,25 @@
 * kernel_gemm_tiled_rect.cu	(CUDA Kernel GEMM (using shared memory)tiled method for rectangle)
 * compare_gemms.cu			(Performace Evaluation Code)
 * kernel_gemm_int8.cu		(CUDA Kernel GEMM for int8 data type)
+* openMP_gemm.cp            (openMP GEMM with Transpose for cache friendly)
 
-## Performace Evaluation of GEMM (wo data transfer time for GPU)
+## Performace Evaluation of GEMM 
 * A[1024, 1024] * B[1024, 1024] = C[1024, 1024]
-* cublas     wo = 1.075 [ms]
-* kernel     wo = 4.844 [ms]
-* kernel sm  wo = 2.678 [ms] (tiled)
-* kernel sm2 wo = 3.014 [ms] (tiled_rect)
-* cpu           = 2592.317 [ms]
-* OpenCV        = 585.577 [ms]
+
+* on GPU(wo : without data transfer time for Device)
+    - cublas     wo = 1.075 [ms]
+    - kernel     wo = 4.844 [ms]
+    - kernel sm  wo = 2.678 [ms] (tiled)
+    - kernel sm2 wo = 3.014 [ms] (tiled_rect)
+* on CPU(T : Transpose for cache friendly)
+    - OpenCV        = 585.577  [ms]
+    - cpu wo T      = 2426.978 [ms]
+    - openMP wo T   = 549.573  [ms]
+    - cpu w T       = 1318.835 [ms]
+    - openMP w t    = 214.211  [ms]
+    
 
 ## Preparing
-* openMP gemm (Preparing)
 * kernel_im2col(Preparing)
 * kernel_col2im(Preparing)
 * kernel_gemm_conv2d(Preparing)
