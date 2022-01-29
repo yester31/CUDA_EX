@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.1705
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_EX", "CUDA_EX\CUDA_EX.vcxproj", "{8459A191-97A5-48E7-9D17-AD021FF146F3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bicubic", "Bicubic\Bicubic.vcxproj", "{F406A0A5-DCCD-4889-890D-705E83755E1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{8459A191-97A5-48E7-9D17-AD021FF146F3}.Debug|x64.Build.0 = Debug|x64
 		{8459A191-97A5-48E7-9D17-AD021FF146F3}.Release|x64.ActiveCfg = Release|x64
 		{8459A191-97A5-48E7-9D17-AD021FF146F3}.Release|x64.Build.0 = Release|x64
+		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Debug|x64.ActiveCfg = Debug|x64
+		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Debug|x64.Build.0 = Debug|x64
+		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Release|x64.ActiveCfg = Release|x64
+		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
