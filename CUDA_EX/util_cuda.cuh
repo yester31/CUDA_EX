@@ -5,6 +5,7 @@
 #include <chrono>
 #include <vector>
 #include <iostream>
+#include <stdlib.h>
 
 // ERROR CHECK
 
@@ -41,20 +42,22 @@ void generate_data_f(float* ptr, unsigned int size) {
 	}
 }
 
-void generate_data_i8(char* ptr, unsigned int size) {
+void generate_data_i8(unsigned char* ptr, unsigned int size) {
 	char tt = 1;
+	srand(777); // rand seed 값 전달
 	while (size--) {
-		*ptr++ = rand() % 10;
+		*ptr++ = rand() % 255; //  0 ~ 32767 사이 난수 생성
 		//*ptr++ = tt;
 	}
 }
 
-
-void valid_results(std::vector<int> &gpu, std::vector<int> &cpu) {
+template <typename T>
+void valid_results(std::vector<T> &gpu, std::vector<T> &cpu) {
 	bool result = true;
 	for (int i = 0; i < gpu.size(); i++) {
 		if ((gpu[i]) != cpu[i]) {
 			printf("[%d] The results is not matched! (%d, %d)\n", i, gpu[i], cpu[i]);
+			//printf("[%d] The results is not matched! \n", i);
 			result = false;
 		}
 	}

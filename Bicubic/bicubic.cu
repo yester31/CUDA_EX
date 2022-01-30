@@ -1,6 +1,6 @@
 // bicubic interpolation kernel 
-
 #include "../CUDA_EX/util_cuda.cuh"
+#include "opencv2/opencv.hpp"
 
 //kernel program for the device (GPU): compiled by NVCC
 __global__ void bicubic(
@@ -45,11 +45,11 @@ __device__ __forceinline__ static void get_cubic_upsampling_coefficients(accscal
 
 template <typename scalar_t>
 __device__ __forceinline__ static scalar_t upsample_get_value_bounded(
-	const float &data, int n, int c, int C, int H, int W, int y, int x) {
+	const scalar_t* data, int n, int c, int C, int H, int W, int y, int x) {
 	int access_y = max(min(y, H - 1), 0);
 	int access_x = max(min(x, W - 1), 0);
 
-	g_idx = n * C * H * W + c * H * W + access_y * H + access_x;
+	int g_idx = n * C * H * W + c * H * W + access_y * H + access_x;
 
 	return data[g_idx];
 }
@@ -77,12 +77,12 @@ __device__ __forceinline__ static accscalar_t area_pixel_compute_source_index(ac
 
 template <typename scalar_t, typename accscalar_t>
 __global__ void upsample_bicubic2d(
-	const int num_elements,
-	const accscalar_t height_scale,
-	const accscalar_t width_scale,
-	const bool align_corners,
+	scalar_t* output, scalar_t* input,
+	accscalar_t height_scale,
+	accscalar_t width_scale,
+	bool align_corners,
 	int N, int C, int H, int W, int P, int Q,
-	float* output, const float* input)
+	int num_elements)
 {
 	int index = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -128,7 +128,8 @@ __global__ void upsample_bicubic2d(
 					t_x);
 			}
 
-			output[n][c][output_y][output_x] = static_cast<scalar_t>(cubic_interp1d(
+			int g_idx = n * C * P * Q + c * P * Q + output_y * Q + output_x;
+			output[g_idx] = static_cast<scalar_t>(cubic_interp1d(
 				coefficients[0],
 				coefficients[1],
 				coefficients[2],
@@ -141,29 +142,34 @@ __global__ void upsample_bicubic2d(
 
 int main(void) {
 	// Bicubic Interpolation
-	// A[M, N] x 2 = C[M * 2, N * 2]
-	const int M = 128;
-	const int N = 128;
+	// A[H, W] x 2 = C[P, Q]
+	int rescale_factor = 2;
+	int N = 1;
+	int C = 3;
+	int H = 128;
+	int W = 128;
+	int P = H * rescale_factor;
+	int Q = W * rescale_factor;
 
-	std::vector<float> input(M * N);
-	std::vector<float> output(M * N * 2 * 2);
-	std::vector<float> output_cpu(M * N * 2 * 2);
+	std::vector<uint8_t> input(N * C * H * W);
+	std::vector<uint8_t> output(N * C * P * Q);
+	std::vector<uint8_t> output_cpu(N * C * P * Q);
 
 	// input data 초기화
-	generate_data_f(input.data(), input.size());
+	generate_data_i8(input.data(), input.size());
 
 	//device-side data
-	float *dev_a = 0;
-	float *dev_o = 0;
+	uint8_t *dev_a = 0;
+	uint8_t *dev_o = 0;
 
 	// allocate device memory
-	CUDA_CHECK(cudaMalloc((void**)&dev_a, input.size() * sizeof(float)));
-	CUDA_CHECK(cudaMalloc((void**)&dev_o, output.size() * sizeof(float)));
+	CUDA_CHECK(cudaMalloc((void**)&dev_a, input.size() * sizeof(uint8_t)));
+	CUDA_CHECK(cudaMalloc((void**)&dev_o, output.size() * sizeof(uint8_t)));
 
 	uint64_t start_time1 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	//copy from host to device 
-	CUDA_CHECK(cudaMemcpy(dev_a, input.data(), input.size() * sizeof(float), cudaMemcpyHostToDevice));//dev_a=a;
+	CUDA_CHECK(cudaMemcpy(dev_a, input.data(), input.size() * sizeof(uint8_t), cudaMemcpyHostToDevice));//dev_a=a;
 
 	//launch a kernel on the GPU with one thread for each element.
 	int thread_cnt = output.size();
@@ -175,13 +181,15 @@ int main(void) {
 
 	uint64_t start_time2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	bicubic << <dimGrid, dimBlock >> > (dev_o, dev_a, M, N, thread_cnt);
+	bool align_corners = true;
+	upsample_bicubic2d << <dimGrid, dimBlock >> > (dev_o, dev_a, rescale_factor, rescale_factor, align_corners, N, C, H, W, P, Q, thread_cnt);
+
 	CUDA_CHECK(cudaPeekAtLastError());
 
 	uint64_t start_time3 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	//copy from device to host
-	CUDA_CHECK(cudaMemcpy(output.data(), dev_o, output.size() * sizeof(float), cudaMemcpyDeviceToHost));//c=dev_c;
+	CUDA_CHECK(cudaMemcpy(output.data(), dev_o, output.size() * sizeof(uint8_t), cudaMemcpyDeviceToHost));//c=dev_c;
 
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -193,13 +201,17 @@ int main(void) {
 
 	//validate gpu kernel function
 
+	cv::Mat src = cv::Mat(H, W, CV_8UC3, input.data());
+	cv::Mat dst(P, Q, CV_8UC3);
+	cv::resize(src, dst, src.size(), cv::INTER_CUBIC); // 정합성 일치
+	memcpy(output_cpu.data(), dst.data, N * C * H * W);
 
 	//validate gpu kernel function
 
 	uint64_t start_time6 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 검증
-	valid_results_f(output, output_cpu);
+	valid_results(output, output_cpu);
 
 	printf("dur_time(gpu) w = %6.3f [msec] \n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) wo = %6.3f [msec] \n", (start_time3 - start_time2) / 1000.f);
