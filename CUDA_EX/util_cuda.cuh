@@ -35,10 +35,11 @@ void generate_data(int* ptr, unsigned int size) {
 }
 
 void generate_data_f(float* ptr, unsigned int size) {
-	float tt = 1;
+	int tt = size;
 	while (size--) {
+		//*ptr++ = rand() % 255; //  0 ~ 32767 사이 난수 생성
 		//*ptr++ = rand() % 10;
-		*ptr++ = tt;
+		*ptr++ = 10 * (tt - size);
 	}
 }
 
@@ -87,11 +88,11 @@ void print_results(std::vector<float> &output, int M, int N) {
 	}std::cout << std::endl; std::cout << std::endl;
 }
 
-void print_results(std::vector<int> &output, int M, int N) {
+void print_results(std::vector<uint8_t> &output, int M, int N) {
 	std::cout << std::endl; std::cout << std::endl;
 	for (int m = 0; m < M; ++m) {
 		for (int n = 0; n < N; ++n) {
-			std::cout << output[m * N + n] << " ";
+			std::cout << (int)output[m * N + n] << " ";
 		}std::cout << std::endl;
 	}std::cout << std::endl; std::cout << std::endl;
 }

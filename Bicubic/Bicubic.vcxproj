@@ -84,9 +84,11 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="bicubic.cu">
+    <CudaCompile Include="backup.cu">
       <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CudaCompile>
+    <CudaCompile Include="bicubic.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CUDA_EX\util_cuda.cuh" />
