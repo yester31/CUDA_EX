@@ -5,7 +5,9 @@
 #include <chrono>
 #include <vector>
 #include <iostream>
-#include <stdlib.h>
+#include <fstream>
+#include <string>
+
 
 // ERROR CHECK
 
@@ -95,4 +97,20 @@ void print_results(std::vector<uint8_t> &output, int M, int N) {
 			std::cout << (int)output[m * N + n] << " ";
 		}std::cout << std::endl;
 	}std::cout << std::endl; std::cout << std::endl;
+}
+
+void tofile(std::vector<float> &Buffer, std::string fname = "../Validation_py/Tensor_from_C") {
+	std::ofstream fs(fname, std::ios::binary);
+	if (fs.is_open())
+		fs.write((const char*)Buffer.data(), Buffer.size() * sizeof(float));
+	fs.close();
+	std::cout << "Done! file production to " << fname << std::endl;
+}
+
+void fromfile(std::vector<uint8_t>& Buffer, std::string fname = "../Validation_py/Tensor_from_py") {
+	std::ifstream ifs(fname, std::ios::binary);
+	if (ifs.is_open())
+		ifs.read((char*)Buffer.data(), Buffer.size() * sizeof(uint8_t));
+	ifs.close();
+	std::cout << "Done! file load from " << fname << std::endl;
 }

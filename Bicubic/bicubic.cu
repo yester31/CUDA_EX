@@ -100,25 +100,23 @@ __global__ void upsample_bicubic2d(
 	}
 }
 
-
 int main(void) {
 	// Bicubic Interpolation
-	// A[H, W] x 2 = C[P, Q]
+	// Input [N, C, H, W] -> Ouput [N, C, P, Q]
 	float rescale_factor = 2.f;
 	int N = 1;
-	int C = 1;
-	int H = 2;
-	int W = 2;
+	int C = 3;
+	int H = 4;
+	int W = 4;
 	int P = H * rescale_factor;
 	int Q = W * rescale_factor;
 
 	std::vector<float> input(N * C * H * W);
 	std::vector<float> output(N * C * P * Q);
-	std::vector<float> output_cpu(N * C * P * Q);
 
 	// input data 초기화
 	generate_data_f(input.data(), input.size());
-
+	print_results(input, H, W);
 	//device-side data
 	float *dev_a = 0;
 	float *dev_o = 0;
@@ -133,7 +131,7 @@ int main(void) {
 	CUDA_CHECK(cudaMemcpy(dev_a, input.data(), input.size() * sizeof(float), cudaMemcpyHostToDevice));//dev_a=a;
 
 	//launch a kernel on the GPU with one thread for each element.
-	int thread_cnt = P * Q;
+	int thread_cnt = N * C * P * Q;
 	int block = 256;
 	int grid = (thread_cnt - 1) / block + 1;
 
@@ -156,30 +154,24 @@ int main(void) {
 
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	//free device memory
-	CUDA_CHECK(cudaFree(dev_o));
-	CUDA_CHECK(cudaFree(dev_a));
-
-	uint64_t start_time5 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-	//validate gpu kernel function
-	//cv::Mat src = cv::Mat(H, W, CV_32FC1, input.data());
-	//cv::Mat dst(P, Q, CV_32FC1);
-	//cv::resize(src, dst, dst.size(), cv::INTER_CUBIC);
-	//memcpy(output_cpu.data(), dst.data, sizeof(float) * N * C * P * Q);
-	//validate gpu kernel function
-
-	uint64_t start_time6 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-
-	// 결과 검증
-	print_results(input, H, W);
-	//print_results(output_cpu, P, Q);
+	// 결과 출력
 	print_results(output, P, Q);
-	//valid_results(output, output_cpu);
 
 	printf("dur_time(gpu) w = %6.3f [msec] \n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) wo = %6.3f [msec] \n", (start_time3 - start_time2) / 1000.f);
-	//printf("dur_time(cpu) = %6.3f [msec] \n", (start_time6 - start_time5) / 1000.f);
+
+	tofile(output, "../Validation_py/Output_C");
+	tofile(input, "../Validation_py/Input_C");
+
+	// python 검증 스크립트 수행
+	printf("\n *Validation with python \n");
+	std::string command = "python ../Validation_py/bicubic.py --N=" + std::to_string(N) + " --C=" + std::to_string(C) + " --H=" + std::to_string(H) + " --W=" + std::to_string(W);
+	const char *cmd = command.c_str();
+	system(cmd); //터미널에 명령어 전달 
+
+	//free device memory
+	CUDA_CHECK(cudaFree(dev_o));
+	CUDA_CHECK(cudaFree(dev_a));
 
 	return 0;
 }
