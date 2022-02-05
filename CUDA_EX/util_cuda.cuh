@@ -39,9 +39,9 @@ void generate_data(int* ptr, unsigned int size) {
 void generate_data_f(float* ptr, unsigned int size) {
 	int tt = size;
 	while (size--) {
-		//*ptr++ = rand() % 255; //  0 ~ 32767 사이 난수 생성
-		//*ptr++ = rand() % 10;
-		*ptr++ = 10 * (tt - size);
+		*ptr++ = rand() % 255; //  0 ~ 255 사이 난수 생성
+		//*ptr++ = rand() % 10; //  0 ~ 10 사이 난수 생성
+		//*ptr++ = 10 * (tt - size); // 10, 20, 30 ...
 	}
 }
 

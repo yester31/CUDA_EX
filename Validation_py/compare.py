@@ -1,5 +1,5 @@
 
-def compare_two_tensor(output, output_c):
+def compare_two_tensor(output, output_c, print_all = False):
     if len(output) != len(output_c):
         print("Tensor size is not same : output_py=%d  output_c=%d" % (len(output), len(output_c)))
         exit()
@@ -18,7 +18,8 @@ def compare_two_tensor(output, output_c):
                 max_idx = idx
                 r0 = output[idx]
                 r = output_c[idx]
-            print("%6d output_py=%10.6f output_c=%10.6f diff=%.6f" % (idx, output[idx], output_c[idx], diff))
+            if print_all:
+                print("%6d output_py=%10.6f output_c=%10.6f diff=%.6f" % (idx, output[idx], output_c[idx], diff))
     if max_diff > 0:
         print("cnt_total=%d cnt_diff=%d max_idx=%6d output_py=%10.6f output_c=%10.6f diff=%.6f" % (
         len(output), cnt_diff, max_idx, r0, r, max_diff))

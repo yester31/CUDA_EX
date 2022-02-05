@@ -2,7 +2,7 @@
  
 ## CUDA Vector Add(Completed)
 * 1d_VectorAdd_ex.cu		(Vector Sum)
-* 
+
 ## CUDA Matrix Multiplication(Completed)
   * cublas_gemm_ex.cu			(GEMM from Cublas lib)
   * kernel_gemm_ex.cu			(CUDA Kernel GEMM)
@@ -26,8 +26,9 @@
         - cpu w T       = 1318.835 [ms]
         - openMP w t    = 214.211  [ms]
         
-## CUDA Bicubic Interpolation(in progress)
-  - using by pytorch bicubic upsample algorithm
-  - not yet optimization
+## CUDA Bicubic Interpolation(Completed)
+  * bicubic.cu
+      - based on pytorch bicubic algorithm
+      - validation results with pytorch up-sample
 
 

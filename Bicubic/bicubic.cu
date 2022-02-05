@@ -1,103 +1,66 @@
-// bicubic interpolation kernel (torch upsample algorithm)
+// bicubic interpolation kernel (from torch upsample algorithm)
 #include "../CUDA_EX/util_cuda.cuh"
-#include "opencv2/opencv.hpp"
 
-template <typename scalar_t, typename accscalar_t>
-__device__ __forceinline__ static accscalar_t cubic_interp1d(scalar_t x0, scalar_t x1, scalar_t x2, scalar_t x3, accscalar_t t) {
-	accscalar_t coeffs[4];
-
-	accscalar_t A = -0.75f;
-	coeffs[0] = ((A * (t + 1.f) - 5.f * A) * (t + 1.f) + 8.f * A) * (t + 1.f) - 4.f * A;
-	coeffs[1] = ((A + 2.f) * t - (A + 3.f)) * t * t + 1.f;
-
-	// opposite coefficients
-	coeffs[2] = ((A + 2.f) * (1.f - t) - (A + 3.f)) * (1.f - t) * (1.f - t) + 1.f;
-	coeffs[3] = 1.f - coeffs[0] - coeffs[1] - coeffs[2];
-	//coeffs[3] = ((A * (2.f - t) - 5.f * A) * (2.f - t) + 8.f * A) * (2.f - t) - 4.f * A;
-
-	return x0 * coeffs[0] + x1 * coeffs[1] + x2 * coeffs[2] + x3 * coeffs[3];
+__device__ __forceinline__ static float cubic1d(float x0, float x1, float x2, float x3, float t) {
+	float A = -0.75f;
+	float coeffs_0 = ((A * (t + 1.f) - 5.f * A) * (t + 1.f) + 8.f * A) * (t + 1.f) - 4.f * A;
+	float coeffs_1 = ((A + 2.f) * t - (A + 3.f)) * t * t + 1.f;
+	float coeffs_2 = ((A + 2.f) * (1.f - t) - (A + 3.f)) * (1.f - t) * (1.f - t) + 1.f;
+	float coeffs_3 = ((A * (2.f - t) - 5.f * A) * (2.f - t) + 8.f * A) * (2.f - t) - 4.f * A;
+	return x0 * coeffs_0 + x1 * coeffs_1 + x2 * coeffs_2 + x3 * coeffs_3;
 }
 
-template <typename accscalar_t>
-__device__ __forceinline__ static accscalar_t area_pixel_compute_source_index(accscalar_t scale, int dst_index, bool align_corners, bool cubic) {
-
-	if (align_corners) {
-		return scale * dst_index;
-	}
-	else {
-		accscalar_t src_idx = scale * (dst_index + static_cast<accscalar_t>(0.5)) - static_cast<accscalar_t>(0.5);
-		// See Note[Follow Opencv resize logic]
-		return (!cubic && src_idx < static_cast<accscalar_t>(0)) ? static_cast<accscalar_t>(0) : src_idx;
-	}
-}
-
-template <typename scalar_t, typename accscalar_t>
-__global__ void upsample_bicubic2d(
-	scalar_t* output, scalar_t* input,
-	accscalar_t height_scale,
-	accscalar_t width_scale,
-	bool align_corners,
+__global__ void bicubic2d(
+	float* output, float* input,
+	float height_scale,
+	float width_scale,
 	int N, int C, int H, int W, int P, int Q,
 	int num_elements)
 {
 	int index = threadIdx.x + blockIdx.x * blockDim.x;
 	if (index >= num_elements) return;
 
-	// Special case: input and output are the same size, just copy
-	const int output_x = index % Q;
-	const int output_y = index / Q;
+	int q_idx = index % Q; // Q 
+	int idx = index / Q;
+	int p_idx = idx % P; // P 
+	idx /= P;
+	int c_idx = idx % C; // C
+	int n_idx = idx / C; // N
+	const int g_idx = n_idx * C * P * Q + c_idx * P * Q + p_idx * Q + q_idx;
 
+	// just copy
 	if (H == P && W == Q) {
-		int g_idx = 0;
-		for (int n = 0; n < N; n++) {
-			for (int c = 0; c < C; c++) {
-				g_idx = n * C * P * Q + c * P * Q + output_y * Q + output_x;
-				const scalar_t val = input[g_idx];
-				output[g_idx] = val;
-			}
-		}
+		output[g_idx] = input[g_idx];
 		return;
 	}
 
 	// Interpolation kernel
-	accscalar_t real_x = area_pixel_compute_source_index(width_scale, output_x, align_corners, /*cubic=*/true);
+	float real_x = width_scale * q_idx;
 	int in_x = floorf(real_x);
-	accscalar_t t_x = real_x - in_x;
+	float t_x = real_x - in_x;
 
-	accscalar_t real_y = area_pixel_compute_source_index(height_scale, output_y, align_corners, /*cubic=*/true);
+	float real_y = height_scale * p_idx;
 	int in_y = floorf(real_y);
-	accscalar_t t_y = real_y - in_y;
+	float t_y = real_y - in_y;
 
-	//printf("in_x : %d, in_y : %d \n", in_x, in_y);
+	float coeff[4];
+	int access_x0 = max(min((in_x - 1), W - 1), 0);
+	int access_x1 = max(min((in_x + 0), W - 1), 0);
+	int access_x2 = max(min((in_x + 1), W - 1), 0);
+	int access_x3 = max(min((in_x + 2), W - 1), 0);
+	int cu_idx = n_idx * C * H * W + c_idx * H * W;
 
-	for (int n = 0; n < N; n++) {
-		for (int c = 0; c < C; c++) {
-			accscalar_t coefficients[4];
-
-			for (int k = 0; k < 4; k++) {
-				int access_y = max(min((in_y - 1 + k), H - 1), 0);
-				int access_x0 = max(min((in_x - 1), W - 1), 0);
-				int access_x1 = max(min((in_x + 0), W - 1), 0);
-				int access_x2 = max(min((in_x + 1), W - 1), 0);
-				int access_x3 = max(min((in_x + 2), W - 1), 0);
-
-				//printf("y : %d, x0 : %d, x1 : %d, x2 : %d, x3 : %d\n", access_y, access_x0, access_x1, access_x2, access_x3);
-				coefficients[k] = cubic_interp1d(
-					input[n * C * H * W + c * H * W + access_y * W + access_x0],
-					input[n * C * H * W + c * H * W + access_y * W + access_x1],
-					input[n * C * H * W + c * H * W + access_y * W + access_x2],
-					input[n * C * H * W + c * H * W + access_y * W + access_x3],
-					t_x);
-			}
-
-			output[n * C * P * Q + c * P * Q + output_y * Q + output_x] = static_cast<scalar_t>(cubic_interp1d(
-				coefficients[0],
-				coefficients[1],
-				coefficients[2],
-				coefficients[3],
-				t_y));
-		}
+	for (int k = 0; k < 4; k++) {
+		int access_y = max(min((in_y - 1 + k), H - 1), 0);
+		coeff[k] = cubic1d(
+			input[cu_idx + access_y * W + access_x0],
+			input[cu_idx + access_y * W + access_x1],
+			input[cu_idx + access_y * W + access_x2],
+			input[cu_idx + access_y * W + access_x3],
+			t_x);
 	}
+
+	output[g_idx] = static_cast<float>(cubic1d(coeff[0], coeff[1], coeff[2], coeff[3], t_y));
 }
 
 int main(void) {
@@ -106,8 +69,8 @@ int main(void) {
 	float rescale_factor = 2.f;
 	int N = 1;
 	int C = 3;
-	int H = 4;
-	int W = 4;
+	int H = 1080;
+	int W = 1920;
 	int P = H * rescale_factor;
 	int Q = W * rescale_factor;
 
@@ -116,7 +79,7 @@ int main(void) {
 
 	// input data 초기화
 	generate_data_f(input.data(), input.size());
-	print_results(input, H, W);
+	//print_results(input, H, W);
 	//device-side data
 	float *dev_a = 0;
 	float *dev_o = 0;
@@ -137,14 +100,14 @@ int main(void) {
 
 	dim3 dimGrid(grid, 1, 1);
 	dim3 dimBlock(block, 1, 1);//x,y,z
+	float h_scale = float(H - 1) / (P - 1);
+	float w_scale = float(W - 1) / (Q - 1);
 
 	uint64_t start_time2 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	bool align_corners = true;
-	float h_scale = float(H - 1) / (P - 1);
-	float w_scale = float(W - 1) / (Q - 1);
-	upsample_bicubic2d << <dimGrid, dimBlock >> > (dev_o, dev_a, h_scale, w_scale, align_corners, N, C, H, W, P, Q, thread_cnt);
+	bicubic2d << <dimGrid, dimBlock >> > (dev_o, dev_a, h_scale, w_scale, N, C, H, W, P, Q, thread_cnt);
 
+	CUDA_CHECK(cudaDeviceSynchronize());
 	CUDA_CHECK(cudaPeekAtLastError());
 
 	uint64_t start_time3 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -155,7 +118,7 @@ int main(void) {
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 출력
-	print_results(output, P, Q);
+	//print_results(output, P, Q);
 
 	printf("dur_time(gpu) w = %6.3f [msec] \n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) wo = %6.3f [msec] \n", (start_time3 - start_time2) / 1000.f);
@@ -175,3 +138,12 @@ int main(void) {
 
 	return 0;
 }
+//int N = 1;
+//int C = 3;
+//int H = 1080;
+//int W = 1920;
+
+//upsample_bicubic2d_opti
+// dur_time(gpu) w = 67.234 [msec]
+// dur_time(gpu) wo = 36.090 [msec]
+// dur time(pytorch) : 153.073 [msec]
