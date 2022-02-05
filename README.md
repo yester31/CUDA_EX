@@ -1,9 +1,14 @@
 # CUDA_EX
- 
+
+## Enviroments
+* Windows 10 laptop
+* CPU 11th Gen Intel(R) Core(TM) i7-11375H @ 3.30GHz (cpu)
+* NVIDIA GeForce RTX 3060 Laptop GPU (gpu)
+
 ## CUDA Vector Add(Completed)
 * 1d_VectorAdd_ex.cu		(Vector Sum)
 
-## CUDA Matrix Multiplication(Completed)
+## CUDA Matrix Multiplication(need debug)
   * cublas_gemm_ex.cu			(GEMM from Cublas lib)
   * kernel_gemm_ex.cu			(CUDA Kernel GEMM)
   * kernel_gemm_sharedmem.cu	(CUDA Kernel GEMM (using shared memory))

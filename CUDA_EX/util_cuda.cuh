@@ -36,11 +36,10 @@ void generate_data(int* ptr, unsigned int size) {
 	}
 }
 
-void generate_data_f(float* ptr, unsigned int size) {
+void generate_data_f(float* ptr, unsigned int size, int offset = 255) {
 	int tt = size;
 	while (size--) {
-		*ptr++ = rand() % 255; //  0 ~ 255 사이 난수 생성
-		//*ptr++ = rand() % 10; //  0 ~ 10 사이 난수 생성
+		*ptr++ = rand() % offset; //  0 ~ offset 사이 난수 생성
 		//*ptr++ = 10 * (tt - size); // 10, 20, 30 ...
 	}
 }
@@ -59,25 +58,13 @@ void valid_results(std::vector<T> &gpu, std::vector<T> &cpu) {
 	bool result = true;
 	for (int i = 0; i < gpu.size(); i++) {
 		if ((gpu[i]) != cpu[i]) {
-			printf("[%d] The results is not matched! (%d, %d)\n", i, gpu[i], cpu[i]);
+			//printf("[%d] The results is not matched! (%d, %d)\n", i, gpu[i], cpu[i]);
 			//printf("[%d] The results is not matched! \n", i);
 			result = false;
 		}
 	}
-	if (result)printf("GPU works well! \n");
-	else printf("GPU and CPU results is not matched! \n");
-}
-
-void valid_results_f(std::vector<float> &result_1, std::vector<float> &result_2) {
-	bool result = true;
-	for (int i = 0; i < result_1.size(); i++) {
-		if ((result_1[i]) != result_2[i]) {
-			//printf("[%d] The results is not matched! (%f, %f)\n", i, result_1[i], result_2[i]);
-			result = false;
-		}
-	}
-	if (result)printf("Results is same!! works well! \n");
-	else printf("results is not matched! \n");
+	if (result)printf("Both values is same. works well! \n");
+	else printf("Both values is not matched! \n");
 }
 
 

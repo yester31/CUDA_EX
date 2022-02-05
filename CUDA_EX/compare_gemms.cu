@@ -134,8 +134,8 @@ int main(void) {
 	std::vector<float> output_cv(M * N);
 
 	// input data 초기화
-	generate_data_f(input_a.data(), input_a.size());
-	generate_data_f(input_b.data(), input_b.size());
+	generate_data_f(input_a.data(), input_a.size(), 10);
+	generate_data_f(input_b.data(), input_b.size(), 10);
 
 	//device-side data
 	float *dev_a = 0;
@@ -228,11 +228,11 @@ int main(void) {
 	memcpy(output_cv.data(), O.data, M * N * sizeof(float));
 
 	// 결과 검증
-	valid_results_f(output_cublas, output_cpu);
-	valid_results_f(output_kernel, output_cpu);
-	valid_results_f(output_kernels, output_cpu);
-	valid_results_f(output_kernels2, output_cpu);
-	valid_results_f(output_cv, output_cpu); 
+	valid_results(output_cublas, output_cpu);
+	valid_results(output_kernel, output_cpu);
+	valid_results(output_kernels, output_cpu);	// error 
+	valid_results(output_kernels2, output_cpu);	// error 
+	valid_results(output_cv, output_cpu); 
 
 	printf("dur_time(cublas)     wo = %6.3f [msec] \n", (start_time2 - start_time1) / 1000.f);
 	printf("dur_time(kernel)     wo = %6.3f [msec] \n", (start_time4 - start_time3) / 1000.f);
