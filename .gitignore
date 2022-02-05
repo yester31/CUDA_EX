@@ -1,5 +1,6 @@
 x64/
 x86/
 .vs/
-Input_C
-Output_C
+*.idea
+Validation_py/Input_C
+Validation_py/Output_C
