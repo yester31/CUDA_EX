@@ -119,9 +119,9 @@ int main() {
 	gemmT_omp(input_a, input_b, output_openMP_Transpose, K);
 	uint64_t start_time8 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-	valid_results_f(output_opneMP, output_cpu);
-	valid_results_f(output_cpu_Transpose, output_cpu);
-	valid_results_f(output_openMP_Transpose, output_cpu);
+	valid_results(output_opneMP, output_cpu);
+	valid_results(output_cpu_Transpose, output_cpu);
+	valid_results(output_openMP_Transpose, output_cpu);
 
 	printf("dur_time(cpu)          = %6.3f [msec] \n", (start_time2 - start_time1) / 1000.f);
 	printf("dur_time(openMP)       = %6.3f [msec] \n", (start_time4 - start_time3) / 1000.f);

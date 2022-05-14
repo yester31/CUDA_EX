@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_EX", "CUDA_EX\CUDA_EX.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bicubic", "Bicubic\Bicubic.vcxproj", "{F406A0A5-DCCD-4889-890D-705E83755E1C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Transpose", "Transpose\Transpose.vcxproj", "{C143995E-D2D0-4DF3-8611-00A8D763939D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Debug|x64.Build.0 = Debug|x64
 		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Release|x64.ActiveCfg = Release|x64
 		{F406A0A5-DCCD-4889-890D-705E83755E1C}.Release|x64.Build.0 = Release|x64
+		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Debug|x64.ActiveCfg = Debug|x64
+		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Debug|x64.Build.0 = Debug|x64
+		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Release|x64.ActiveCfg = Release|x64
+		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
