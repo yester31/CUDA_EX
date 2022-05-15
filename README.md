@@ -15,9 +15,9 @@
   * kernel_gemm_tiled.cu		(CUDA Kernel GEMM (using shared memory)tiled method for square)
   * kernel_gemm_tiled_rect.cu	(CUDA Kernel GEMM (using shared memory)tiled method for rectangle)
   * compare_gemms.cu			(Performace Evaluation Code)
-  * kernel_gemm_int8.cu		(CUDA Kernel GEMM for int8 data type)
-  * openMP_gemm.cpp           (openMP GEMM with Transpose for cache friendly)
-  * opencv_gemm_ex.cpp		(GEMM from OpenCV lib)
+  * kernel_gemm_int8.cu		    (CUDA Kernel GEMM for int8 data type)
+  * openMP_gemm.cpp             (openMP GEMM with Transpose for cache friendly)
+  * opencv_gemm_ex.cpp		    (GEMM from OpenCV lib)
   * Performace Evaluation for A[1024, 1024] * B[1024, 1024] = C[1024, 1024]
     * on GPU(wo : without data transfer time for Device)
         - cublas     wo = 1.075 [ms]
@@ -35,5 +35,12 @@
   * bicubic.cu
       - based on pytorch bicubic algorithm
       - validation results with pytorch up-sample
+  
+## CUDA Matrix Transpose(Completed)
+   * Matrix Transpose kernel
+       - naive transpose
+       - tiled transpose
+       - tilde coalesced transpose using by shared memory 
+       - tilde coalesced padded transpose using by shared memory 
 
 

@@ -9,24 +9,6 @@
 #include <string>
 
 
-// ERROR CHECK
-
-#if defined(NDEBUG)     //release mode
-#define CUDA_CHECK(x) (x)   
-#else                   // debug mode
-//error check 
-#define CUDA_CHECK(x)   do{\
-    (x); \
-    cudaError_t e = cudaGetLastError(); \
-    if (e != cudaSuccess) { \
-        printf("cuda failure %s at %s:%d \n", \
-        cudaGetErrorString(e), \
-            __FILE__, __LINE__); \
-        exit(0); \
-    } \
-}while(0)
-#endif
-
 // 0 - 100 사이 정수로 데이터 초기화
 void generate_data(int* ptr, unsigned int size) {
 	int tt = 0;
@@ -101,3 +83,20 @@ void fromfile(std::vector<uint8_t>& Buffer, std::string fname = "../Validation_p
 	ifs.close();
 	std::cout << "Done! file load from " << fname << std::endl;
 }
+
+// ERROR CHECK
+#if defined(NDEBUG)     //release mode
+#define CUDA_CHECK(x) (x)   
+#else                   // debug mode
+//error check 
+#define CUDA_CHECK(x)   do{\
+    (x); \
+    cudaError_t e = cudaGetLastError(); \
+    if (e != cudaSuccess) { \
+        printf("cuda failure %s at %s:%d \n", \
+        cudaGetErrorString(e), \
+            __FILE__, __LINE__); \
+        exit(0); \
+    } \
+}while(0)
+#endif
