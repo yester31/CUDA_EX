@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1705
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUDA_EX", "CUDA_EX\CUDA_EX.vcxproj", "{8459A191-97A5-48E7-9D17-AD021FF146F3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MatrixMultiplication", "CUDA_EX\CUDA_EX.vcxproj", "{8459A191-97A5-48E7-9D17-AD021FF146F3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bicubic", "Bicubic\Bicubic.vcxproj", "{F406A0A5-DCCD-4889-890D-705E83755E1C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Transpose", "Transpose\Transpose.vcxproj", "{C143995E-D2D0-4DF3-8611-00A8D763939D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Reduction", "Reduction\Reduction.vcxproj", "{969DEA24-953F-4962-BD71-DC01CB227E26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Debug|x64.Build.0 = Debug|x64
 		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Release|x64.ActiveCfg = Release|x64
 		{C143995E-D2D0-4DF3-8611-00A8D763939D}.Release|x64.Build.0 = Release|x64
+		{969DEA24-953F-4962-BD71-DC01CB227E26}.Debug|x64.ActiveCfg = Debug|x64
+		{969DEA24-953F-4962-BD71-DC01CB227E26}.Debug|x64.Build.0 = Debug|x64
+		{969DEA24-953F-4962-BD71-DC01CB227E26}.Release|x64.ActiveCfg = Release|x64
+		{969DEA24-953F-4962-BD71-DC01CB227E26}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

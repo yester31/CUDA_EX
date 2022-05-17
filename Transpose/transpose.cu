@@ -54,8 +54,6 @@ void transpose_naive_gpu(std::vector<float>& output_gpu, std::vector<float>& inp
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 출력
-	//print_results(input, H, W);
-	//print_results(output_gpu, W, H);
 	printf("dur_time(gpu) = %6.3f [msec] (with data transfer time)\n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) = %6.3f [msec] (without data transfer time)\n", (start_time3 - start_time2) / 1000.f);
 
@@ -112,8 +110,6 @@ void transpose_tiled_gpu(std::vector<float>& output_gpu, std::vector<float>& inp
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 출력
-	//print_results(input, H, W);
-	//print_results(output_gpu, W, H);
 	printf("dur_time(gpu) = %6.3f [msec] (with data transfer time)\n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) = %6.3f [msec] (without data transfer time)\n", (start_time3 - start_time2) / 1000.f);
 
@@ -180,8 +176,6 @@ void transpose_tiled_coalesced_gpu(std::vector<float>& output_gpu, std::vector<f
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 출력
-	//print_results(input, H, W);
-	//print_results(output_gpu, W, H);
 	printf("dur_time(gpu) = %6.3f [msec] (with data transfer time)\n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) = %6.3f [msec] (without data transfer time)\n", (start_time3 - start_time2) / 1000.f);
 
@@ -248,8 +242,6 @@ void transpose_tiled_coalesced_padded_gpu(std::vector<float>& output_gpu, std::v
 	uint64_t start_time4 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 	// 결과 출력
-	//print_results(input, H, W);
-	//print_results(output_gpu, W, H);
 	printf("dur_time(gpu) = %6.3f [msec] (with data transfer time)\n", (start_time4 - start_time1) / 1000.f);
 	printf("dur_time(gpu) = %6.3f [msec] (without data transfer time)\n", (start_time3 - start_time2) / 1000.f);
 
