@@ -42,7 +42,6 @@ int main(void) {
 
 	// input data ÃÊ±âÈ­
 	generate_data_f(input.data(), input.size());
-	//print_results(input, H, W);
 
 	transpose_naive_gpu(output_gpu, input, H, W);
 
