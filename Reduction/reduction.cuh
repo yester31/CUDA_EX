@@ -27,3 +27,5 @@
 
 void reduction_0_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
 void reduction_1_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
+void reduction_2_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
+void reduction_3_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
