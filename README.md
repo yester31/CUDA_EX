@@ -4,10 +4,10 @@
 * Windows 10 laptop
 * CPU 11th Gen Intel(R) Core(TM) i7-11375H @ 3.30GHz (cpu)
 * NVIDIA GeForce RTX 3060 Laptop GPU (gpu)
-
+***
 ## CUDA Vector Add(Completed)
 * 1d_VectorAdd_ex.cu		(Vector Sum)
-
+***
 ## CUDA Matrix Multiplication(need debug)
   * cublas_gemm_ex.cu			(GEMM from Cublas lib)
   * kernel_gemm_ex.cu			(CUDA Kernel GEMM)
@@ -30,17 +30,28 @@
         - openMP wo T   = 549.573  [ms]
         - cpu w T       = 1318.835 [ms]
         - openMP w t    = 214.211  [ms]
-        
+***     
 ## CUDA Bicubic Interpolation(Completed)
   * bicubic.cu
       - based on pytorch bicubic algorithm
       - validation results with pytorch up-sample
-  
+***
 ## CUDA Matrix Transpose(Completed)
    * Matrix Transpose kernel
        - naive transpose
        - tiled transpose
        - tilde coalesced transpose using by shared memory 
        - tilde coalesced padded transpose using by shared memory 
-
-
+***
+## CUDA Reduction(on progress)
+   * Reduction kernel
+       - interleaved addressing with divergent branching
+       - interleaved addressing with bank conflicts
+       - sequential addressing
+       - first add during global load
+       - unroll last warp
+***
+       
+## reference   
+* transpose : <https://developer.nvidia.com/blog/efficient-matrix-transpose-cuda-cc/>
+* reduction : <https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/reduction/doc/reduction.pdf>

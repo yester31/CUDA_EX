@@ -1,5 +1,5 @@
 #include "transpose.cuh"
-// reference : https://github.com/jeonggunlee/CUDATeaching
+// reference : https://developer.nvidia.com/blog/efficient-matrix-transpose-cuda-cc/
 
 static void transpose_cpu(float* output, float* input, int H, int W)
 {

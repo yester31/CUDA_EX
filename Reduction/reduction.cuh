@@ -25,7 +25,8 @@
 }while(0)
 #endif
 
-void reduction_0_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
-void reduction_1_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
-void reduction_2_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
-void reduction_3_gpu(std::vector<long>& output_gpu, std::vector<long>& input);
+void reduction_0_gpu(std::vector<int>& output_gpu, std::vector<int>& input);
+void reduction_1_gpu(std::vector<int>& output_gpu, std::vector<int>& input);
+void reduction_2_gpu(std::vector<int>& output_gpu, std::vector<int>& input);
+void reduction_3_gpu(std::vector<int>& output_gpu, std::vector<int>& input);
+void reduction_4_gpu(std::vector<int>& output_gpu, std::vector<int>& input);

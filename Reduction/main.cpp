@@ -1,17 +1,16 @@
 #include "reduction.cuh"
-// reference : https://github.com/jeonggunlee/CUDATeaching
 // reference : https://developer.download.nvidia.com/compute/cuda/1.1-Beta/x86_website/projects/reduction/doc/reduction.pdf
 
-static void reduction_cpu(long long int* output, long* input, int size)
+static void reduction_cpu(int* output, int* input, int size)
 {
-	long long int sum = 0;
+    long sum = 0;
 	for (int idx = 0; idx < size; idx++) {
 		sum += input[idx];
 	}
 	*output = sum;
 }
 
-static void generate_data_f(long* ptr, long size, int offset = 255) {
+static void generate_data_f(int* ptr, int size, int offset = 255) {
 	long  tt = size;
 	while (size--) {
 		//*ptr++ = rand() % offset; //  0 ~ offset 사이 난수 생성
@@ -24,21 +23,17 @@ static void generate_data_f(long* ptr, long size, int offset = 255) {
 int main(void) {
 	// Reduction
 	// Input [size] -> Ouput [1]
-	std::cout << "Size of long long int : " << sizeof(long long int) << std::endl;
-	std::cout << "Size of long long : " << sizeof(long long) << std::endl;
-	std::cout << "Size of long int : " << sizeof(long int) << std::endl;
-	std::cout << "Size of long : " << sizeof(long) << std::endl;
-	std::cout << "Size of int : " << sizeof(int) << std::endl;
 	long size = 1 << 22; // 2^10
 	std::cout << "size : " << size << std::endl;
 
 	//int size = 10;
-	std::vector<long> input(size);
-	long long int sum = 0;
-	std::vector<long> output_gpu0(size);
-	std::vector<long> output_gpu1(size);
-	std::vector<long> output_gpu2(size);
-	std::vector<long> output_gpu3(size);
+	std::vector<int> input(size);
+    int sum = 0;
+	std::vector<int> output_gpu0(size);
+	std::vector<int> output_gpu1(size);
+	std::vector<int> output_gpu2(size);
+	std::vector<int> output_gpu3(size);
+	std::vector<int> output_gpu4(size);
 
 	// input data 초기화
 	generate_data_f(input.data(), input.size());
@@ -51,6 +46,8 @@ int main(void) {
 
 	reduction_3_gpu(output_gpu3, input);
 
+	reduction_4_gpu(output_gpu4, input);
+
 	// 결과 검증 수행
 	uint64_t start_time5 = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	reduction_cpu(&sum, input.data(), size);
@@ -60,7 +57,8 @@ int main(void) {
 	std::cout << "output_gpu0 : " << output_gpu0[0] << std::endl;
 	std::cout << "output_gpu1 : " << output_gpu1[0] << std::endl;
 	std::cout << "output_gpu2 : " << output_gpu2[0] << std::endl;
-	std::cout << "output_gpu3 : " << output_gpu2[0] << std::endl;
+	std::cout << "output_gpu3 : " << output_gpu3[0] << std::endl;
+	std::cout << "output_gpu4 : " << output_gpu4[0] << std::endl;
 
 	//valid_results(output_gpu, output_cpu);
 
