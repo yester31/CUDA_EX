@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.2)
+project(SGEMM LANGUAGES CXX CUDA)
+
+# Use C++ 17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CPP_STANDARD 17 CACHE STRING "CPP Standard Version")
+
+# Set CUDA library paths
+find_package(CUDA REQUIRED)
+set(CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda)
+link_directories(/usr/local/cuda/lib64)
+
+# Include directories
+include_directories(${CUDA_INCLUDE_DIRS})
+
+cuda_add_library(cuda_kernel SHARED sgemm.cu)
+target_link_libraries(cuda_kernel nvinfer cudart)
+
+add_executable(main sgemm.cpp)
+target_link_libraries(main cuda_kernel)
+set_property(TARGET main PROPERTY CUDA_ARCHITECTURES "86")
+
+message(STATUS "CMAKE_CUDA_COMPILER: ${CMAKE_CUDA_COMPILER}") 
+message(STATUS "CMAKE_CUDA_ARCHITECTURES: ${CMAKE_CUDA_ARCHITECTURES}") 
+
+# C++ compiler flags (optional)
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall")

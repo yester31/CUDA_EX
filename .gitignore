@@ -4,3 +4,13 @@ x86/
 *.idea
 Validation_py/Input_C
 Validation_py/Output_C
+
+build/
+cmake-build-debug/
+cmake-build-release/
+.idea/
+
+# VSCode, but include settings.json
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
