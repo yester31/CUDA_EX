@@ -2,12 +2,21 @@
 #include <iostream>
 #include <vector>
 
-void generate_data_f(float *ptr, unsigned int size, int offset = 255)
+void generate_data_f0(float *ptr, unsigned int size, int offset = 255)
 {
     int tt = size;
     while (size--)
     {
         *ptr++ = (rand() % offset) / 100.0f;
+    }
+}
+
+void generate_data_f(float *ptr, unsigned int size)
+{
+    int tt = 0;
+    while (size--)
+    {
+        *ptr++ = tt++;
     }
 }
 
@@ -55,33 +64,35 @@ int main(void)
 
     // GEMM parameters
     const int M = 3;
-    const int K = 4;
-    const int N = 5;
+    const int K = 2;
+    const int N = 4;
     const float alpha = 1.0f;
     const float beta = 1.0f;
 
     // matrix initialization
     std::vector<float> matrix_a(M * K);
     std::vector<float> matrix_b(K * N);
-    std::vector<float> matrix_c(M * N);
-    std::vector<float> matrix_c_cpu(M * N);
+    std::vector<float> matrix_c(M * N, 0.0f);
+    std::vector<float> matrix_c_cpu(M * N, 0.0f);
 
     // generate random data
-    generate_data_f(matrix_a.data(), matrix_a.size());
-    generate_data_f(matrix_b.data(), matrix_b.size());
-    generate_data_f(matrix_c.data(), matrix_c.size());
-    matrix_c_cpu = matrix_c;
+    generate_data_f0(matrix_a.data(), matrix_a.size());
+    generate_data_f0(matrix_b.data(), matrix_b.size());
 
     // Print the matrix matrices
-    // print_matrix(matrix_a.data(), M, K, "Matrix A");
-    // print_matrix(matrix_b.data(), K, N, "Matrix B");
-    // print_matrix(matrix_c.data(), M, N, "Matrix C");
-    // print_matrix(matrix_c_cpu.data(), M, N, "Matrix C_cpu");
+    print_matrix(matrix_a.data(), M, K, "Matrix A");
+    print_matrix(matrix_b.data(), K, N, "Matrix B");
+    print_matrix(matrix_c.data(), M, N, "Matrix C");
+    print_matrix(matrix_c_cpu.data(), M, N, "Matrix C_cpu");
 
     // CPU sgemm
     Timer timer("cpu sgemm");
     sgemm_cpu(matrix_a.data(), matrix_b.data(), matrix_c_cpu.data(), M, K, N, alpha, beta);
     timer.Stop();
+
+    print_matrix(matrix_c_cpu.data(), M, N, "Matrix C_cpu 2");
+    print_matrix(matrix_c.data(), M, N, "Matrix C 2");
+
     // device-side data
     float *dev_a = 0;
     float *dev_b = 0;
