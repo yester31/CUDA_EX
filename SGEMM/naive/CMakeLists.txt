@@ -1,4 +1,4 @@
-# ... existing cmake version and project definition ...
+cmake_minimum_required(VERSION 3.31)
 
 # Enable CUDA language support more explicitly
 enable_language(CUDA)
@@ -23,5 +23,5 @@ set_target_properties(cuda_kernel PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON)
 
 # Create executable
-add_executable(main sgemm.cpp)
+add_executable(main main.cpp)
 target_link_libraries(main PRIVATE CUDA::cudart cuda_kernel)

@@ -14,15 +14,12 @@ __global__ void sgemm_kernel_navie(
     int32_t const K,
     int32_t const N,
     T const alpha,
-    T const beta,
-    const int tcount)
+    T const beta)
 {
-    int pos = threadIdx.x + blockIdx.x * blockDim.x;
-    if (pos >= tcount)
-        return;
+    // compute position in C that this thread is responsible for
+    const uint x_idx = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint y_idx = blockIdx.y * blockDim.y + threadIdx.y;
 
-    int x_idx = pos % N;
-    int y_idx = pos / N;
     T sum = 0;
     for (int k = 0; k < K; ++k)
     {
@@ -43,12 +40,11 @@ cudaError_t SGEMM_Naive_Impl(cudaStream_t stream,
                              T const beta)
 {
     // launch a kernel on the GPU with one thread for each element.
-    int thread_cnt = M * N;
-    int block = 256;
-    int grid = (thread_cnt - 1) / block + 1;
-    dim3 dimGrid(grid, 1, 1);
-    dim3 dimBlock(block, 1, 1); // x,y,z
-    sgemm_kernel_navie<T><<<dimGrid, dimBlock, 0, stream>>>(A, B, C, M, K, N, alpha, beta, thread_cnt);
+    dim3 gridDim(CEIL_DIV(M, 32), CEIL_DIV(N, 32), 1);
+    // 32 * 32 = 1024 thread per block
+    dim3 blockDim(32, 32, 1);
+
+    sgemm_kernel_navie<T><<<gridDim, blockDim, 0, stream>>>(A, B, C, M, K, N, alpha, beta);
     return cudaGetLastError();
 }
 
