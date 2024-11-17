@@ -65,18 +65,7 @@ int main(void)
     CUDA_CHECK(cudaMemcpy(matrix_c.data(), dev_c, matrix_c.size() * sizeof(float), cudaMemcpyDeviceToHost)); // c=dev_c;
 
     // Compare CPU and GPU results
-    Timer timer3("compare");
-    auto max_diff = get_max_diff(matrix_c, matrix_c_cpu);
-    timer3.Stop();
-    if (max_diff == -1)
-    {
-        std::cerr << "Matrix size mismatch: " << matrix_c.size() << " vs " << matrix_c_cpu.size() << std::endl;
-        return -1;
-    }
-
-    const float tolerance = 1e-2f;
-    std::cout << "Max difference between CPU and GPU results: " << max_diff << std::endl
-              << (max_diff <= tolerance ? "MATCH" : "MISMATCH") << " (tolerance: " << tolerance << ")" << std::endl;
+    get_max_diff(matrix_c, matrix_c_cpu);
 
     // free device memory
     CUDA_CHECK(cudaFree(dev_c));

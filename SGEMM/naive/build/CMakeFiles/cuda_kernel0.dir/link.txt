@@ -1,1 +1,0 @@
-/usr/bin/g++ -fPIC -shared -Wl,-soname,libcuda_kernel0.so -o libcuda_kernel0.so @CMakeFiles/cuda_kernel0.dir/objects1.rsp CMakeFiles/cuda_kernel0.dir/cmake_device_link.o @CMakeFiles/cuda_kernel0.dir/linkLibs.rsp -L"/usr/local/cuda-12.2/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda-12.2/targets/x86_64-linux/lib"

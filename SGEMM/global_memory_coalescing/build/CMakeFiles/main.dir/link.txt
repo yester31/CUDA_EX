@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/main.dir/main.cpp.o -o main  -Wl,-rpath,/usr/local/cuda-12.2/targets/x86_64-linux/lib:/home/pyh/cuda_ex/CUDA_EX/SGEMM/global_memory_coalescing/build /usr/local/cuda-12.2/targets/x86_64-linux/lib/libcudart.so libcuda_kernel1.so -ldl /usr/lib/x86_64-linux-gnu/librt.a

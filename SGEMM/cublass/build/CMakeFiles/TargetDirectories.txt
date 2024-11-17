@@ -1,3 +1,0 @@
-/home/pyh/cuda_ex/CUDA_EX/SGEMM/cublass/build/CMakeFiles/main.dir
-/home/pyh/cuda_ex/CUDA_EX/SGEMM/cublass/build/CMakeFiles/edit_cache.dir
-/home/pyh/cuda_ex/CUDA_EX/SGEMM/cublass/build/CMakeFiles/rebuild_cache.dir

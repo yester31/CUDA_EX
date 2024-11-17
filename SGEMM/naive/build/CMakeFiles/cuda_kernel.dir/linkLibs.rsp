@@ -1,1 +1,0 @@
- "/usr/local/cuda-12.2/targets/x86_64-linux/lib/libcudart.so" -ldl "/usr/lib/x86_64-linux-gnu/librt.a" -lcudadevrt -lcudart_static -lrt -lpthread -ldl 
