@@ -1,0 +1,4 @@
+/home/pyh/cuda_ex/CUDA_EX/SGEMM/compare/build/CMakeFiles/cuda_kernel.dir
+/home/pyh/cuda_ex/CUDA_EX/SGEMM/compare/build/CMakeFiles/main.dir
+/home/pyh/cuda_ex/CUDA_EX/SGEMM/compare/build/CMakeFiles/edit_cache.dir
+/home/pyh/cuda_ex/CUDA_EX/SGEMM/compare/build/CMakeFiles/rebuild_cache.dir
