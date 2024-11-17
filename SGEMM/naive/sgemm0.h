@@ -17,7 +17,4 @@ cudaError_t SGEMM_Naive_Impl(
     T const beta);
 
 
-#define CEIL_DIV(M, N) (((M) + (N)-1) / (N))
-
-
 #endif // SGEMM_KERNEL_H

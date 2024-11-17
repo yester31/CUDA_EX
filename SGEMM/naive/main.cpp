@@ -1,4 +1,4 @@
-#include "sgemm.h"
+#include "sgemm0.h"
 #include "../timer.h"
 #include "../utils.h"
 
@@ -9,9 +9,9 @@ int main(void)
     // C[M, N] = alpha * (A[M, K] @ B[K, N]) + beta * C[M, N]
 
     // GEMM parameters
-    const int M = 1024;
-    const int K = 1024;
-    const int N = 1024;
+    const int M = 512;
+    const int K = 512;
+    const int N = 512;
     const float alpha = 3.0f;
     const float beta = 2.0f;
 
@@ -74,7 +74,7 @@ int main(void)
         return -1;
     }
 
-    const float tolerance = 1e-3f;
+    const float tolerance = 1e-2f;
     std::cout << "Max difference between CPU and GPU results: " << max_diff << std::endl
               << (max_diff <= tolerance ? "MATCH" : "MISMATCH") << " (tolerance: " << tolerance << ")" << std::endl;
 

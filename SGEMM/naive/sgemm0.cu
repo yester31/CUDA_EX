@@ -1,6 +1,8 @@
 #include <cuda.h>
 #include <cuda_fp16.h>
-#include "sgemm.h"
+#include "sgemm0.h"
+
+#define CEIL_DIV(M, N) (((M) + (N) - 1) / (N))
 
 using half = __half;
 
@@ -17,15 +19,18 @@ __global__ void sgemm_kernel_navie(
     T const beta)
 {
     // compute position in C that this thread is responsible for
-    const uint x_idx = blockIdx.x * blockDim.x + threadIdx.x;
-    const uint y_idx = blockIdx.y * blockDim.y + threadIdx.y;
+    const uint row = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint col = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (row >= M || col >= N)
+        return;
 
     T sum = 0;
     for (int k = 0; k < K; ++k)
     {
-        sum += A[y_idx * K + k] * B[k * N + x_idx];
+        sum += A[row * K + k] * B[k * N + col];
     }
-    C[y_idx * N + x_idx] = alpha * sum + beta * C[y_idx * N + x_idx];
+    C[row * N + col] = alpha * sum + beta * C[row * N + col];
 }
 
 template <typename T>
@@ -39,6 +44,7 @@ cudaError_t SGEMM_Naive_Impl(cudaStream_t stream,
                              T const alpha,
                              T const beta)
 {
+    // row-> x, col-> y
     // launch a kernel on the GPU with one thread for each element.
     dim3 gridDim(CEIL_DIV(M, 32), CEIL_DIV(N, 32), 1);
     // 32 * 32 = 1024 thread per block
