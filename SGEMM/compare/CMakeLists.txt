@@ -16,7 +16,7 @@ find_package(CUDAToolkit REQUIRED)  # Modern way to find CUDA
 include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
 # # Create CUDA library
-add_library(cuda_kernel SHARED ../naive/sgemm.cu)
+add_library(cuda_kernel SHARED ../naive/sgemm0.cu ../global_memory_coalescing/sgemm1.cu)
 target_link_libraries(cuda_kernel PRIVATE CUDA::cudart)
 set_target_properties(cuda_kernel PROPERTIES 
     CUDA_ARCHITECTURES "86"

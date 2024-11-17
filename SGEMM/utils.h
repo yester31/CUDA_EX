@@ -6,6 +6,7 @@
 // ERROR CHECK
 #if defined(NDEBUG) // release mode
 #define CUDA_CHECK(x) (x)
+#define CUBLAS_CHECK(x) (x)
 #else // debug mode
 // error check
 #define CUDA_CHECK(x)                             \
@@ -20,6 +21,19 @@
                    __FILE__, __LINE__);           \
             exit(0);                              \
         }                                         \
+    } while (0)
+
+#define CUBLAS_CHECK(x)                             \
+    do                                              \
+    {                                               \
+        cublasStatus_t status = (x);                \
+        if (status != CUBLAS_STATUS_SUCCESS)        \
+        {                                           \
+            printf("cublas failure %d at %s:%d \n", \
+                   static_cast<int>(status),        \
+                   __FILE__, __LINE__);             \
+            exit(0);                                \
+        }                                           \
     } while (0)
 #endif
 
@@ -69,12 +83,11 @@ void sgemm_cpu(const float *A, const float *B, float *C,
     }
 };
 
-float get_max_diff(std::vector<float> matrix_1, std::vector<float> matrix_2)
+void get_max_diff(const std::vector<float> &matrix_1, const std::vector<float> &matrix_2, const float tolerance = 1e-2f)
 {
     if (matrix_1.size() != matrix_2.size())
     {
-        std::cerr << "Matrix sizes do not match" << std::endl;
-        return -1;
+        std::cerr << "Matrix sizes do not match" << matrix_1.size() << " vs " << matrix_2.size() << std::endl;
     }
     float max_diff = 0.0f;
     for (size_t i = 0; i < matrix_1.size(); ++i)
@@ -82,5 +95,7 @@ float get_max_diff(std::vector<float> matrix_1, std::vector<float> matrix_2)
         float diff = std::abs(matrix_1[i] - matrix_2[i]);
         max_diff = std::max(max_diff, diff);
     }
-    return max_diff;
+
+    std::cout << "=> " << (max_diff <= tolerance ? "MATCH" : "MISMATCH")
+              << " (tolerance: " << tolerance << ", " << "Max diff: " << max_diff << ")" << std::endl;
 };
