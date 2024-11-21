@@ -1,4 +1,4 @@
-#include "sgemm1.h"
+#include "sgemm.h"
 #include "../timer.h"
 #include "../utils.h"
 

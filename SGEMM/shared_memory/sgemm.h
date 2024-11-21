@@ -1,11 +1,11 @@
-#ifndef SGEMM_KERNEL_H
-#define SGEMM_KERNEL_H
+#ifndef SGEMM_SHARED_MEMORY_H
+#define SGEMM_SHARED_MEMORY_H
 
 #include <cuda_runtime.h>
 #include <stdint.h>
 
 template <typename T>
-cudaError_t SGEMM_Naive_Impl(
+cudaError_t SGEMM_Shared_Memory_Impl(
     cudaStream_t stream,
     T const *A,
     T const *B,
@@ -16,5 +16,4 @@ cudaError_t SGEMM_Naive_Impl(
     T const alpha,
     T const beta);
 
-
-#endif // SGEMM_KERNEL_H
+#endif // SGEMM_SHARED_MEMORY_H

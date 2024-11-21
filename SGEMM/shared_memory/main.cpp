@@ -47,7 +47,7 @@ int main(void)
     CUDA_CHECK(cudaMalloc((void **)&dev_c, matrix_c.size() * sizeof(float)));
 
     // warmup
-    CUDA_CHECK(SGEMM_Naive_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Shared_Memory_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
     CUDA_CHECK(cudaStreamSynchronize(stream));
 
     // copy from host to device
@@ -57,7 +57,7 @@ int main(void)
 
     // GPU sgemm
     Timer timer2("gpu sgemm");
-    CUDA_CHECK(SGEMM_Naive_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Shared_Memory_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
     CUDA_CHECK(cudaStreamSynchronize(stream));
     timer2.Stop();
 

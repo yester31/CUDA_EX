@@ -1,11 +1,11 @@
-#ifndef SGEMM1_KERNEL_H
-#define SGEMM1_KERNEL_H
+#ifndef SGEMM_NAIVE_H
+#define SGEMM_NAIVE_H
 
 #include <cuda_runtime.h>
 #include <stdint.h>
 
 template <typename T>
-cudaError_t SGEMM_Global_Memory_Coalescing_Impl(
+cudaError_t SGEMM_Naive_Impl(
     cudaStream_t stream,
     T const *A,
     T const *B,
@@ -16,4 +16,5 @@ cudaError_t SGEMM_Global_Memory_Coalescing_Impl(
     T const alpha,
     T const beta);
 
-#endif // SGEMM1_KERNEL_H
+
+#endif // SGEMM_NAIVE_H

@@ -1,6 +1,6 @@
 #include <cuda.h>
 #include <cuda_fp16.h>
-#include "sgemm0.h"
+#include "sgemm.h"
 
 #define CEIL_DIV(M, N) (((M) + (N) - 1) / (N))
 
