@@ -19,7 +19,11 @@ include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 add_library(cuda_kernel SHARED  
     ../naive/sgemm.cu 
     ../global_memory_coalescing/sgemm.cu 
-    ../shared_memory/sgemm.cu)
+    ../shared_memory/sgemm.cu
+    ../shared_memory_wo_bank_conflict/sgemm.cu
+    ../shared_memory_gmc/sgemm.cu
+    ../shared_memory_1/sgemm.cu
+    )
 
 target_link_libraries(cuda_kernel PRIVATE CUDA::cudart)
 set_target_properties(cuda_kernel PROPERTIES 

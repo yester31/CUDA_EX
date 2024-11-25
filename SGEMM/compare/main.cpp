@@ -27,7 +27,9 @@ int main(void)
     std::vector<float> matrix_c0(M * N);
     std::vector<float> matrix_c1(M * N);
     std::vector<float> matrix_c2(M * N);
-
+    std::vector<float> matrix_c3(M * N);
+    std::vector<float> matrix_c4(M * N);
+    std::vector<float> matrix_c5(M * N);
     // generate random data
     generate_random_data(matrix_a.data(), matrix_a.size());
     generate_random_data(matrix_b.data(), matrix_b.size());
@@ -46,6 +48,9 @@ int main(void)
     float *dev_c0 = 0;
     float *dev_c1 = 0;
     float *dev_c2 = 0;
+    float *dev_c3 = 0;
+    float *dev_c4 = 0;
+    float *dev_c5 = 0;
     float *dev_c_cublas = 0;
 
     // allocate device memory
@@ -54,6 +59,9 @@ int main(void)
     CUDA_CHECK(cudaMalloc((void **)&dev_c0, matrix_c0.size() * sizeof(float)));
     CUDA_CHECK(cudaMalloc((void **)&dev_c1, matrix_c1.size() * sizeof(float)));
     CUDA_CHECK(cudaMalloc((void **)&dev_c2, matrix_c2.size() * sizeof(float)));
+    CUDA_CHECK(cudaMalloc((void **)&dev_c3, matrix_c3.size() * sizeof(float)));
+    CUDA_CHECK(cudaMalloc((void **)&dev_c4, matrix_c4.size() * sizeof(float)));
+    CUDA_CHECK(cudaMalloc((void **)&dev_c5, matrix_c5.size() * sizeof(float)));
     CUDA_CHECK(cudaMalloc((void **)&dev_c_cublas, matrix_c_cublas.size() * sizeof(float)));
 
     // copy from host to device
@@ -62,12 +70,18 @@ int main(void)
     CUDA_CHECK(cudaMemcpy(dev_c0, matrix_c_cublas.data(), matrix_c0.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
     CUDA_CHECK(cudaMemcpy(dev_c1, matrix_c_cublas.data(), matrix_c1.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
     CUDA_CHECK(cudaMemcpy(dev_c2, matrix_c_cublas.data(), matrix_c2.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
+    CUDA_CHECK(cudaMemcpy(dev_c3, matrix_c_cublas.data(), matrix_c3.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
+    CUDA_CHECK(cudaMemcpy(dev_c4, matrix_c_cublas.data(), matrix_c4.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
+    CUDA_CHECK(cudaMemcpy(dev_c5, matrix_c_cublas.data(), matrix_c5.size() * sizeof(float), cudaMemcpyHostToDevice));             // dev_b=b;
     CUDA_CHECK(cudaMemcpy(dev_c_cublas, matrix_c_cublas.data(), matrix_c_cublas.size() * sizeof(float), cudaMemcpyHostToDevice)); // dev_b=b;
 
     // warmup & verify
     CUDA_CHECK(SGEMM_Naive_Impl<float>(stream, dev_a, dev_b, dev_c0, M, K, N, alpha, beta));
     CUDA_CHECK(SGEMM_Global_Memory_Coalescing_Impl<float>(stream, dev_a, dev_b, dev_c1, M, K, N, alpha, beta));
     CUDA_CHECK(SGEMM_Shared_Memory_Impl<float>(stream, dev_a, dev_b, dev_c2, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Shared_Memory_WO_Bank_Conflict_Impl<float>(stream, dev_a, dev_b, dev_c3, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Shared_Memory_GMC_Impl<float>(stream, dev_a, dev_b, dev_c4, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Shared_Memory_1_Impl<float>(stream, dev_a, dev_b, dev_c5, M, K, N, alpha, beta));
     CUBLAS_CHECK(cublasSgemm(cublasHandle, CUBLAS_OP_N, CUBLAS_OP_N, N, M, K, &alpha, dev_b, N, dev_a, K, &beta, dev_c_cublas, N));
     CUDA_CHECK(cudaStreamSynchronize(stream));
 
@@ -75,13 +89,19 @@ int main(void)
     CUDA_CHECK(cudaMemcpy(matrix_c0.data(), dev_c0, matrix_c0.size() * sizeof(float), cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaMemcpy(matrix_c1.data(), dev_c1, matrix_c1.size() * sizeof(float), cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaMemcpy(matrix_c2.data(), dev_c2, matrix_c2.size() * sizeof(float), cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(matrix_c3.data(), dev_c3, matrix_c3.size() * sizeof(float), cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(matrix_c4.data(), dev_c4, matrix_c4.size() * sizeof(float), cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(matrix_c5.data(), dev_c5, matrix_c5.size() * sizeof(float), cudaMemcpyDeviceToHost));
     CUDA_CHECK(cudaMemcpy(matrix_c_cublas.data(), dev_c_cublas, matrix_c_cublas.size() * sizeof(float), cudaMemcpyDeviceToHost));
 
     // Compare two results results
     std::cout << "[Accuracy Verification]" << std::endl;
-    get_max_diff(matrix_c_cublas, matrix_c0);
-    get_max_diff(matrix_c_cublas, matrix_c1);
-    get_max_diff(matrix_c_cublas, matrix_c2);
+    get_max_diff(matrix_c_cublas, matrix_c0); // naive
+    get_max_diff(matrix_c_cublas, matrix_c1); // GMC
+    get_max_diff(matrix_c_cublas, matrix_c2); // shared memory
+    get_max_diff(matrix_c_cublas, matrix_c3); // shared memory wo bank conflict
+    get_max_diff(matrix_c_cublas, matrix_c4); // shared memory GMC
+    get_max_diff(matrix_c_cublas, matrix_c5); // shared memory 1
     std::cout << "[Comparison of Latency]" << std::endl;
 
     // GPU sgemm
@@ -119,15 +139,36 @@ int main(void)
     timer3.Stop();
 
     // GPU sgemm
-    Timer timer4("=> shared memory sgemm");
+    Timer timer4("=> shared memory w bank conflict sgemm");
     CUDA_CHECK(SGEMM_Shared_Memory_Impl<float>(stream, dev_a, dev_b, dev_c2, M, K, N, alpha, beta));
     CUDA_CHECK(cudaStreamSynchronize(stream));
     timer4.Stop();
+
+    // GPU sgemm
+    Timer timer5("=> shared memory wo bank conflict sgemm");
+    CUDA_CHECK(SGEMM_Shared_Memory_WO_Bank_Conflict_Impl<float>(stream, dev_a, dev_b, dev_c3, M, K, N, alpha, beta));
+    CUDA_CHECK(cudaStreamSynchronize(stream));
+    timer5.Stop();
+
+    // GPU sgemm
+    Timer timer6("=> shared memory GMC sgemm");
+    CUDA_CHECK(SGEMM_Shared_Memory_GMC_Impl<float>(stream, dev_a, dev_b, dev_c4, M, K, N, alpha, beta));
+    CUDA_CHECK(cudaStreamSynchronize(stream));
+    timer6.Stop();
+
+    // GPU sgemm
+    Timer timer7("=> shared memory 1 sgemm");
+    CUDA_CHECK(SGEMM_Shared_Memory_1_Impl<float>(stream, dev_a, dev_b, dev_c5, M, K, N, alpha, beta));
+    CUDA_CHECK(cudaStreamSynchronize(stream));
+    timer7.Stop();
 
     // free device memory
     CUDA_CHECK(cudaFree(dev_c0));
     CUDA_CHECK(cudaFree(dev_c1));
     CUDA_CHECK(cudaFree(dev_c2));
+    CUDA_CHECK(cudaFree(dev_c3));
+    CUDA_CHECK(cudaFree(dev_c4));
+    CUDA_CHECK(cudaFree(dev_c5));
     CUDA_CHECK(cudaFree(dev_c_cublas));
     CUDA_CHECK(cudaFree(dev_a));
     CUDA_CHECK(cudaFree(dev_b));

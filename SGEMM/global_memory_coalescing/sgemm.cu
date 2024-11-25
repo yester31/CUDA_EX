@@ -20,18 +20,18 @@ __global__ void sgemm_kernel_global_memory_coalescing(
     T const beta)
 {
     // compute position in C that this thread is responsible for
-    const uint row = blockIdx.y * blockDim.y + threadIdx.y;
-    const uint col = blockIdx.x * blockDim.x + threadIdx.x;
+    const uint h_idx = blockIdx.y * blockDim.y + threadIdx.y; // M h
+    const uint w_idx = blockIdx.x * blockDim.x + threadIdx.x; // N w
 
-    if (row >= M || col >= N)
+    if (h_idx >= M || w_idx >= N)
         return;
 
     T sum = 0;
     for (int k = 0; k < K; ++k)
     {
-        sum += A[row * K + k] * B[k * N + col];
+        sum += A[h_idx * K + k] * B[k * N + w_idx];
     }
-    C[row * N + col] = alpha * sum + beta * C[row * N + col];
+    C[h_idx * N + w_idx] = alpha * sum + beta * C[h_idx * N + w_idx];
 }
 
 template <typename T>

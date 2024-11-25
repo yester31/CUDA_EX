@@ -1,3 +1,6 @@
 #include "naive/sgemm.h"
 #include "global_memory_coalescing/sgemm.h"
 #include "shared_memory/sgemm.h"
+#include "shared_memory_wo_bank_conflict/sgemm.h"
+#include "shared_memory_gmc/sgemm.h"
+#include "shared_memory_1/sgemm.h"
