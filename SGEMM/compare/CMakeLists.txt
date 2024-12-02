@@ -23,6 +23,9 @@ add_library(cuda_kernel SHARED
     ../shared_memory_wo_bank_conflict/sgemm.cu
     ../shared_memory_gmc/sgemm.cu
     ../shared_memory_1/sgemm.cu
+    ../1d_block_tiling/sgemm.cu
+    ../2d_block_tiling/sgemm.cu
+    ../vectorized_mem_access/sgemm.cu
     )
 
 target_link_libraries(cuda_kernel PRIVATE CUDA::cudart)

@@ -1,7 +1,6 @@
 #include "sgemm.h"
 #include "../timer.h"
 #include "../utils.h"
-// https://docs.nvidia.com/cuda/cuda-c-programming-guide/#shared-memory
 
 int main(void)
 {
@@ -13,7 +12,7 @@ int main(void)
     const int M = 512;
     const int K = 512;
     const int N = 512;
-    const float alpha = 1.0f;
+    const float alpha = 3.0f;
     const float beta = 2.0f;
 
     // matrix initialization
@@ -48,7 +47,7 @@ int main(void)
     CUDA_CHECK(cudaMalloc((void **)&dev_c, matrix_c.size() * sizeof(float)));
 
     // warmup
-    CUDA_CHECK(SGEMM_Shared_Memory_1_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Warp_Tiling_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
     CUDA_CHECK(cudaStreamSynchronize(stream));
 
     // copy from host to device
@@ -58,7 +57,7 @@ int main(void)
 
     // GPU sgemm
     Timer timer2("gpu sgemm");
-    CUDA_CHECK(SGEMM_Shared_Memory_1_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
+    CUDA_CHECK(SGEMM_Warp_Tiling_Impl<float>(stream, dev_a, dev_b, dev_c, M, K, N, alpha, beta));
     CUDA_CHECK(cudaStreamSynchronize(stream));
     timer2.Stop();
 

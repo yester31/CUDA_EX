@@ -201,9 +201,7 @@ cudaError_t SGEMM_Shared_Memory_1_Impl(cudaStream_t stream,
                                        T const alpha,
                                        T const beta)
 {
-    // row-> y, col-> x
     dim3 gridDim(CEIL_DIV(N, BLOCK_SIZE), CEIL_DIV(M, BLOCK_SIZE), 1);
-    // dim3 gridDim(CEIL_DIV(M, BLOCK_SIZE), CEIL_DIV(N, BLOCK_SIZE), 1);
     dim3 blockDim(BLOCK_SIZE * BLOCK_SIZE);
     cudaFuncSetAttribute(sgemm_kernel_shared_memory_1<T>,
                          cudaFuncAttributePreferredSharedMemoryCarveout,

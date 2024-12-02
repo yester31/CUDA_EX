@@ -4,3 +4,6 @@
 #include "shared_memory_wo_bank_conflict/sgemm.h"
 #include "shared_memory_gmc/sgemm.h"
 #include "shared_memory_1/sgemm.h"
+#include "1d_block_tiling/sgemm.h"
+#include "2d_block_tiling/sgemm.h"
+#include "vectorized_mem_access/sgemm.h"
